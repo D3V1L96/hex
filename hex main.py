@@ -111,7 +111,7 @@ security_level = "LOW"
 
 
 # ==================== USER CONFIGURATION ====================
-OPENWEATHER_API_KEY = "set your openweatherapikey"
+OPENWEATHER_API_KEY = "put your api key"
 CITY_ID = "xxxxx"  # Delhi
 USER_DATA_DIR = os.path.join(os.path.expanduser("~"), ".H.E.X_hud")
 os.makedirs(USER_DATA_DIR, exist_ok=True)
@@ -119,8 +119,8 @@ IPC_PATH = os.path.join(USER_DATA_DIR, "hex_ipc.json")
 
 APPS_FILE = "apps.json"
 REMINDERS_FILE = "reminders.json"
-SERP_API_KEY = "set your serp api key"
-OPENROUTER_API_KEY = "llm key put here"
+SERP_API_KEY = "serpapi key here"
+OPENROUTER_API_KEY = "router key here"
 
 VOICE_FEMALE = "en-US-JennyNeural"
 VOICE_MALE = "en-US-DavisNeural"
@@ -167,11 +167,10 @@ DEFAULT_PRINT_TEMPLATE = 'print("{text}")'
 
 
 # ==================== HELPER FUNCTIONS ====================
-def send_media_key_play_pause():
-    VK_MEDIA_PLAY_PAUSE = 0xB3
-    ctypes.windll.user32.keybd_event(VK_MEDIA_PLAY_PAUSE, 0, 0, 0)
+def send_media_key(key_code):
+    ctypes.windll.user32.keybd_event(key_code, 0, 0, 0)
     time.sleep(0.05)
-    ctypes.windll.user32.keybd_event(VK_MEDIA_PLAY_PAUSE, 0, 2, 0)
+    ctypes.windll.user32.keybd_event(key_code, 0, 2, 0)
 
 
 def get_spotify_track_desktop():
@@ -356,10 +355,10 @@ class SidePanel(QWidget):
         self.now_playing.setText(f"Now Playing: {text}")
 
     def play_spotify(self):
-        send_media_key_play_pause()
+        send_media_key(0xB3)
 
     def stop_spotify(self):
-        send_media_key_play_pause()
+        send_media_key(0xB3)
 
 
 class HUDWindow(QWidget):
@@ -1481,16 +1480,22 @@ def play_youtube(song):
     speak(f"Searching {song} on YouTube.")
 
 def media_control(action):
-    actions = {"play": "play pause", "next": "next track", "previous": "prev track"}
-    pyautogui.press(actions.get(action, "play pause"))
-    speak(f"{action.capitalize()}ing.")
+    if action == "play":
+        send_media_key(0xB3)  # Play/Pause
+        speak("Playing/Pausing.")
+    elif action == "next":
+        send_media_key(0xB0)  # Next Track
+        speak("Skipping to next track.")
+    elif action == "previous":
+        send_media_key(0xB1)  # Previous Track
+        speak("Going to previous track.")
 
 def volume_up():
-    pyautogui.press("volume up")
+    pyautogui.press('volumeup')
     speak("increased volume.")
 
 def volume_down():
-    pyautogui.press("volume down")
+    pyautogui.press('volumedown')
     speak("volume decreased.")
 
 def set_volume(percent):
